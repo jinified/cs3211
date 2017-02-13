@@ -35,7 +35,6 @@ bash matrix_mult.sh 8 ../log/lab1_task3.log
 #+RESULTS:
 
 *** Tabulate result from Lab01 Task 4 (Tembusu, 40 threads)
-
 #+BEGIN_SRC bash
 cd lab1
 bash matrix_mult.sh 40 ../log/lab1_task4.log
@@ -48,7 +47,8 @@ bash matrix_mult.sh 40 ../log/lab1_task4.log
 
 ** Memory Effects
 
-*** Tabulate result from Lab01 Task 6 (lab machine)
+*** DONE Tabulate result from Lab01 Task 6 (lab machine)
+    CLOSED: [2017-02-13 Mon 17:18]
 #+BEGIN_SRC bash
 ./lab1/testmem > log/lab1_task6.log
 #+END_SRC
@@ -59,18 +59,20 @@ bash matrix_mult.sh 40 ../log/lab1_task4.log
 
 ** Accuracy
 
-*** Tabulate result from Lab02 Task 1-4
+*** DONE Tabulate result from Lab02 Task 1-4
+    CLOSED: [2017-02-13 Mon 17:33]
 #+BEGIN_SRC bash
 ./lab2/fpadd1 > log/lab2_task1.log;
 ./lab2/fpadd2 > log/lab2_task2.log;
 ./lab2/fporder > log/lab2_task3.log;
-./lab2/fpomp > log/lab2_task4.log
+./lab2/fpomp > log/lab2_task4.log # Run on Tembusu
 #+END_SRC
 *** What is causing the behaviour ?
 
 ** Communication. speedup
 
-*** Tabulate result from Lab02 Task 7 (8, 16, 24, ...64 processes)
+*** DONE Tabulate result from Lab02 Task 7 (8, 16, 24, ...64 processes)
+    CLOSED: [2017-02-13 Mon 17:19]
 #+BEGIN_SRC bash
 cd lab2
 mpirun -machinefile machinefile.1 -np 8 ./mm-mpi 2>&1 | tee task7_8.txt
@@ -107,6 +109,15 @@ mpirun -machinefile machinefile.1 -np 8 ./mm-mpi 2>&1 | tee task7_8.txt
 
 ** Tabulate result and discuss
 
+** Resources
+
+*** [[http://grafijs.org/][Grafijs]]
+
+*** [[http://camanjs.com/][Camanjs]] 
+
+*** [[https://inspirit.github.io/jsfeat/][JSFeat]] 
+
+*** [[https://trackingjs.com/][Tracking.js]]
 * Output
   DEADLINE: <2017-03-01 Wed>
 

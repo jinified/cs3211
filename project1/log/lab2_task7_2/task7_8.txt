@@ -1,0 +1,7 @@
+ --- SLAVE 0: communication_time=  0.37 seconds; computation_time= 19.13 seconds
+ --- SLAVE 1: communication_time=  0.37 seconds; computation_time= 20.88 seconds
+ --- SLAVE 2: communication_time=  2.16 seconds; computation_time= 19.09 seconds
+ --- SLAVE 3: communication_time=  0.51 seconds; computation_time= 20.75 seconds
+ --- SLAVE 4: communication_time=  2.00 seconds; computation_time= 19.26 seconds
+ --- SLAVE 5: communication_time=  0.46 seconds; computation_time= 20.80 seconds
+ --- SLAVE 6: communication_time=  1.56 seconds; computation_time= 19.71 seconds

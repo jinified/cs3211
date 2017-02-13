@@ -1,0 +1,16 @@
+Array size: 4 kB and time taken is 0.166390 secs
+Array size: 8 kB and time taken is 0.197122 secs
+Array size: 16 kB and time taken is 0.194843 secs
+Array size: 32 kB and time taken is 0.201811 secs
+Array size: 64 kB and time taken is 0.135917 secs
+Array size: 128 kB and time taken is 0.135780 secs
+Array size: 256 kB and time taken is 0.139045 secs
+Array size: 512 kB and time taken is 0.168007 secs
+Array size: 1024 kB and time taken is 0.169705 secs
+Array size: 2048 kB and time taken is 0.170014 secs
+Array size: 4096 kB and time taken is 0.170613 secs
+Array size: 8192 kB and time taken is 0.274321 secs
+Array size: 16384 kB and time taken is 0.477061 secs
+Array size: 32768 kB and time taken is 0.479718 secs
+Array size: 65536 kB and time taken is 0.475626 secs
+Array size: 131072 kB and time taken is 0.480520 secs
