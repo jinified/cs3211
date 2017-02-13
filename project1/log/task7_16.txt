@@ -1,0 +1,31 @@
+xcnd2.comp.nus.edu.sg.22963hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+xcnd2.comp.nus.edu.sg.22965hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+xcnd2.comp.nus.edu.sg.22964hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+xcnd2.comp.nus.edu.sg.22962hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+xcnd1.comp.nus.edu.sg.2130hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+xcnd1.comp.nus.edu.sg.2131hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+xcnd1.comp.nus.edu.sg.2134hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+xcnd1.comp.nus.edu.sg.2129hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+xcnd1.comp.nus.edu.sg.2127hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+xcnd1.comp.nus.edu.sg.2133hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+xcnd1.comp.nus.edu.sg.2132hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+xcnd1.comp.nus.edu.sg.2143hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+xcnd1.comp.nus.edu.sg.2139hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+xcnd1.comp.nus.edu.sg.2145hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+xcnd1.comp.nus.edu.sg.2141hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+xcnd1.comp.nus.edu.sg.2128hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
+ --- SLAVE 0: communication_time=  2.17 seconds; computation_time=  9.17 seconds
+ --- SLAVE 2: communication_time=  2.16 seconds; computation_time=  9.25 seconds
+ --- SLAVE 4: communication_time=  2.16 seconds; computation_time=  9.26 seconds
+ --- SLAVE 8: communication_time=  2.16 seconds; computation_time=  9.29 seconds
+ --- SLAVE 7: communication_time=  2.17 seconds; computation_time=  9.30 seconds
+ --- SLAVE 9: communication_time=  2.16 seconds; computation_time=  9.37 seconds
+ --- SLAVE 1: communication_time=  2.17 seconds; computation_time=  9.37 seconds
+ --- SLAVE 11: communication_time=  2.17 seconds; computation_time=  9.40 seconds
+ --- SLAVE 3: communication_time=  2.17 seconds; computation_time=  9.41 seconds
+ --- SLAVE 6: communication_time=  2.17 seconds; computation_time=  9.42 seconds
+ --- SLAVE 5: communication_time=  2.17 seconds; computation_time=  9.43 seconds
+ --- SLAVE 10: communication_time=  2.18 seconds; computation_time=  9.44 seconds
+ --- SLAVE 12: communication_time=  2.45 seconds; computation_time=  9.17 seconds
+ --- SLAVE 13: communication_time=  3.78 seconds; computation_time=  7.85 seconds
+ --- SLAVE 14: communication_time=  2.67 seconds; computation_time=  8.95 seconds

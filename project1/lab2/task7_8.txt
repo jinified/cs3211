@@ -1,4 +1,5 @@
-bash: orted: command not found
+ssh: Could not resolve hostname xcnd1: Name or service not known
+ssh: Could not resolve hostname xcnd2: Name or service not known
 --------------------------------------------------------------------------
 ORTE was unable to reliably start one or more daemons.
 This usually is caused by:

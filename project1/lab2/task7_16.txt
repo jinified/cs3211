@@ -1,31 +1,25 @@
-xcnd2.comp.nus.edu.sg.22963hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
-xcnd2.comp.nus.edu.sg.22965hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
-xcnd2.comp.nus.edu.sg.22964hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
-xcnd2.comp.nus.edu.sg.22962hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
-xcnd1.comp.nus.edu.sg.2130hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
-xcnd1.comp.nus.edu.sg.2131hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
-xcnd1.comp.nus.edu.sg.2134hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
-xcnd1.comp.nus.edu.sg.2129hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
-xcnd1.comp.nus.edu.sg.2127hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
-xcnd1.comp.nus.edu.sg.2133hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
-xcnd1.comp.nus.edu.sg.2132hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
-xcnd1.comp.nus.edu.sg.2143hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
-xcnd1.comp.nus.edu.sg.2139hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
-xcnd1.comp.nus.edu.sg.2145hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
-xcnd1.comp.nus.edu.sg.2141hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
-xcnd1.comp.nus.edu.sg.2128hfi_wait_for_device: The /dev/hfi1_0 device failed to appear after 15.0 seconds: Connection timed out
- --- SLAVE 0: communication_time=  2.17 seconds; computation_time=  9.17 seconds
- --- SLAVE 2: communication_time=  2.16 seconds; computation_time=  9.25 seconds
- --- SLAVE 4: communication_time=  2.16 seconds; computation_time=  9.26 seconds
- --- SLAVE 8: communication_time=  2.16 seconds; computation_time=  9.29 seconds
- --- SLAVE 7: communication_time=  2.17 seconds; computation_time=  9.30 seconds
- --- SLAVE 9: communication_time=  2.16 seconds; computation_time=  9.37 seconds
- --- SLAVE 1: communication_time=  2.17 seconds; computation_time=  9.37 seconds
- --- SLAVE 11: communication_time=  2.17 seconds; computation_time=  9.40 seconds
- --- SLAVE 3: communication_time=  2.17 seconds; computation_time=  9.41 seconds
- --- SLAVE 6: communication_time=  2.17 seconds; computation_time=  9.42 seconds
- --- SLAVE 5: communication_time=  2.17 seconds; computation_time=  9.43 seconds
- --- SLAVE 10: communication_time=  2.18 seconds; computation_time=  9.44 seconds
- --- SLAVE 12: communication_time=  2.45 seconds; computation_time=  9.17 seconds
- --- SLAVE 13: communication_time=  3.78 seconds; computation_time=  7.85 seconds
- --- SLAVE 14: communication_time=  2.67 seconds; computation_time=  8.95 seconds
+ssh: Could not resolve hostname xcnd1: Name or service not known
+ssh: Could not resolve hostname xcnd2: Name or service not known
+--------------------------------------------------------------------------
+ORTE was unable to reliably start one or more daemons.
+This usually is caused by:
+
+* not finding the required libraries and/or binaries on
+  one or more nodes. Please check your PATH and LD_LIBRARY_PATH
+  settings, or configure OMPI with --enable-orterun-prefix-by-default
+
+* lack of authority to execute on one or more specified nodes.
+  Please verify your allocation and authorities.
+
+* the inability to write startup files into /tmp (--tmpdir/orte_tmpdir_base).
+  Please check with your sys admin to determine the correct location to use.
+
+*  compilation of the orted with dynamic libraries when static are required
+  (e.g., on Cray). Please check your configure cmd line and consider using
+  one of the contrib/platform definitions for your system type.
+
+* an inability to create a connection back to mpirun due to a
+  lack of common network interfaces and/or no route found between
+  them. Please check network connectivity (including firewalls
+  and network routing requirements).
+--------------------------------------------------------------------------

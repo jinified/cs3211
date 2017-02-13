@@ -1,0 +1,115 @@
+#+AUTHOR: Tan Soon Jin
+#+EMAIL: a0112213@u.nus.edu
+#+TITLE: CS3211 project 1 - Image processing: implementation and analysis
+
+* TODO Part 1
+
+** Hardware
+*** Find out hardwares used in lab and Tembusu clusters
+#+BEGIN_SRC shell
+#!/usr/bin/sh
+
+# Create dir to store log
+cd log || mkdir log
+
+# Get CPU information
+lscpu > log/lscpu.log
+cat /proc/cpuinfo > log/cpuinfo.log 
+
+# Get memory information
+cat /proc/meminfo > log/meminfo.log
+#+END_SRC
+
+#+RESULTS:
+
+*** How the hardware contributes to the result
+** Speedup
+
+*** Tabulate result from Lab01 Task 3 (lab machine, 8 threads)
+#+BEGIN_SRC bash
+cd lab1
+bash matrix_mult.sh 8 ../log/lab1_task3.log
+
+#+END_SRC
+
+#+RESULTS:
+
+*** Tabulate result from Lab01 Task 4 (Tembusu, 40 threads)
+
+#+BEGIN_SRC bash
+cd lab1
+bash matrix_mult.sh 40 ../log/lab1_task4.log
+#+END_SRC
+*** Interpret the result based on
+
+**** Fixed-time
+
+**** Fixed-size
+
+** Memory Effects
+
+*** Tabulate result from Lab01 Task 6 (lab machine)
+#+BEGIN_SRC bash
+./lab1/testmem > log/lab1_task6.log
+#+END_SRC
+
+#+RESULTS:
+
+*** What is causing the behaviour ?
+
+** Accuracy
+
+*** Tabulate result from Lab02 Task 1-4
+#+BEGIN_SRC bash
+./lab2/fpadd1 > log/lab2_task1.log;
+./lab2/fpadd2 > log/lab2_task2.log;
+./lab2/fporder > log/lab2_task3.log;
+./lab2/fpomp > log/lab2_task4.log
+#+END_SRC
+*** What is causing the behaviour ?
+
+** Communication. speedup
+
+*** Tabulate result from Lab02 Task 7 (8, 16, 24, ...64 processes)
+#+BEGIN_SRC bash
+cd lab2
+mpirun -machinefile machinefile.1 -np 8 ./mm-mpi 2>&1 | tee task7_8.txt
+#+END_SRC
+*** What is causing the behaviour ?
+
+*** How does openMPI implementation scale when run on multiple processors ?
+
+* TODO Part 2 [[http://www.comp.nus.edu.sg/~hugh/cs3211/project/demo.html][Demo]]
+
+** Develop as many image processing functions implemented on GPU.js.
+
+*** Input: animation or movie file
+
+** Users should be able to see CPU vs GPU comparisons clearly for each functions
+
+** Focus on parallelized components
+
+** [[http://gpu.rocks/getting-started/][Getting started with GPU.js]] 
+
+** Criterias to be judged
+
+*** Anything special for accuracy ? speedup ? workload reduction ?
+
+*** Anything to improve the system ?
+
+*** Adjusting parameters to specify different methods of operation
+
+*** Implementing camera motion/fly-through technique
+
+*** Implement other animations and background not provided
+
+*** Provide evidence of testing
+
+** Tabulate result and discuss
+
+* Output
+  DEADLINE: <2017-03-01 Wed>
+
+** A0112213.zip
+
+** Hardcopy
