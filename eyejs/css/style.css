@@ -1,0 +1,22 @@
+body {
+    background-color: #111111;
+}
+
+#main-menu {
+    text-align: center;
+    background-color:  #85144b;  /*Maroon*/
+    font-size: 2.4rem;
+}
+
+#main-menu dt {
+    display: inline-block;
+    margin-right: 5rem;
+}
+
+#main-menu dt a{
+    color: #FFFFFF;
+}
+
+a:hover {
+    background-color:  #FF4136;
+}
