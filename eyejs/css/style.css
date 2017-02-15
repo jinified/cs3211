@@ -1,22 +1,87 @@
+html * {
+    font-family: Helvetica !important;
+}
+
 body {
     background-color: #111111;
 }
 
-#main-menu {
-    text-align: center;
+#main-menu ul {
+    list-style-type: none;
+    overflow: hidden;
     background-color:  #85144b;  /*Maroon*/
-    font-size: 2.4rem;
 }
 
-#main-menu dt {
-    display: inline-block;
-    margin-right: 5rem;
+#info-menu {
+    list-style-type: none;
+    overflow: hidden;
 }
 
-#main-menu dt a{
+#info-menu li .button-outline {
+    font-size: 1.8rem;
+    border-color: white;
+    color: white;
+    padding: 0.5rem;
+}
+
+#info-menu li .button-outline:hover {
+    border-color: white;
+}
+
+#main-menu li {
+    float: left;
+    margin: 0;
+}
+
+#main-menu li .button {
+    display: block;
+    text-align: center;
+    margin: 1.4rem 1.4rem;
     color: #FFFFFF;
+    font-size: 1.8rem;
 }
 
-a:hover {
-    background-color:  #FF4136;
+.button-select {
+    background-color: #0074D9;
+    overflow: hidden;
+}
+
+#ops_label {
+    background: transparent;
+    border: none;
+    padding-right: 0;
+}
+
+#size_label {
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.ops_options {
+    overflow: hidden;
+}
+
+#toggle {
+    background-color:  #2ECC40;
+}
+
+#info {
+    background-color: #AAAAAA;
+}
+
+#main_layout {
+    margin: 2rem;
+}
+
+#sidebar {
+    text-align: center;
+}
+
+#container {
+    text-align: center;
+}
+
+canvas {
+    display: inline;
 }

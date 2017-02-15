@@ -3,26 +3,66 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>CS3211: Eye.js</title>
+        <title>EYE.js</title>
         <meta name="description" content="CS3211 Project 1 Part 2 Implementation">
         <meta name="author" content="A0112213">
 
-        <!-- Google Fonts -->
-        <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+        <!-- Favicon -->
+        <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+        <link rel="icon" href="favicon.ico" type="image/x-icon">
         <!-- CSS Normalize -->
         <link rel="stylesheet" href="css/normalize.css" />
         <link rel="stylesheet" href="css/milligram.min.css" />
+        <link rel="stylesheet" href="css/boostrap.min.css" />
         <link rel="stylesheet" href="css/style.css" />
     </head>
 
     <body>
         <nav id="main-menu">
-            <dl>
-                <dt><a href="#">Home</a></dt>
-                <dt><a href="#">Documentations</a></dt>
-                <dt><a href="#">Source</a></dt>
-            </dl>
+            <ul>
+                <li><a class="button" href="https://github.com/jinified/cs3211/tree/master/eyejs">Source</a></li>
+                <li><a class="button" id="mode">GPU Mode</a></li>
+                <li><label class="button" id="size_label">Size:</label>
+                </li>
+                <li>
+                    <div class="canvas_options">
+                        <select name="resolution" class="button button-select">
+                            <option value="192">192</option>
+                            <option  value="320">320</option>
+                            <option value="480" selected="selected">480</option>
+                            <option value="640">640</option>
+                            <option value="960">960</option>
+                        </select>
+                    </div>
+                </li>
+                <li><label class="button" id="ops_label">Chosen&nbspOperation:</label>
+                </li>
+                <li>
+                    <div class="ops_options">
+                        <select name="operation" class="button button-select">
+                            <option value="1" selected="selected">Cartoonize</option>
+                            <option  value="2">Sobel&nbspEdge</option>
+                            <option value="3">Gaussian&nbspBlur</option>
+                        </select>
+                    </div>
+                </li>
+                <li><button type="button" class="button" id="toggle">Play</button></li>
+            </ul>
         </nav>
+
+        <div class="row" id="main_layout">
+            <div class="column column-10" id="sidebar">
+                <ul id="info-menu">
+                    <li><label class="button button-outline">FPS&nbsp25</label></li>
+                </ul>
+            </div>
+            <div class="column" id="container">
+                <canvas id="viewport" width=640 height=600>
+                </canvas>
+            </div>
+        </div>
+        <script src="js/lib/jquery.min.js"></script>
         <script src="js/lib/gpu.min.js"></script>
+        <script src="js/main.js"></script>
     </body>
 </html>
