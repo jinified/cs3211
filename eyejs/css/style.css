@@ -3,29 +3,22 @@ html * {
 }
 
 body {
-    background-color: #111111;
+    background-color: black;
 }
+
+/* miligram classes */
+
+.button {
+    background-color:  #FF851B;
+    border: none;
+}
+
+/* Navigation Bar */
 
 #main-menu ul {
     list-style-type: none;
     overflow: hidden;
-    background-color:  #85144b;  /*Maroon*/
-}
-
-#info-menu {
-    list-style-type: none;
-    overflow: hidden;
-}
-
-#info-menu li .button-outline {
-    font-size: 1.8rem;
-    border-color: white;
-    color: white;
-    padding: 0.5rem;
-}
-
-#info-menu li .button-outline:hover {
-    border-color: white;
+    background-color:  #85144b;
 }
 
 #main-menu li {
@@ -39,11 +32,6 @@ body {
     margin: 1.4rem 1.4rem;
     color: #FFFFFF;
     font-size: 1.8rem;
-}
-
-.button-select {
-    background-color: #0074D9;
-    overflow: hidden;
 }
 
 #ops_label {
@@ -62,7 +50,7 @@ body {
     overflow: hidden;
 }
 
-#toggle {
+#render_toggle {
     background-color:  #2ECC40;
 }
 
@@ -74,14 +62,31 @@ body {
     margin: 2rem;
 }
 
+
+/* Sidebar */
+
 #sidebar {
     text-align: center;
 }
+
+#sidebar h1 {
+    font-size: 2.4rem;
+    color: white;
+}
+
+#fps {
+    background-color:  #B10DC9;
+    font-size: 1.8rem;
+}
+
+/* Main canvas */
 
 #container {
     text-align: center;
 }
 
-canvas {
-    display: inline;
+#viewport canvas {
+    padding: 0;
+    margin: auto;
+    display: block;
 }

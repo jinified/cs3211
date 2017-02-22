@@ -26,12 +26,12 @@
                 </li>
                 <li>
                     <div class="canvas_options">
-                        <select name="resolution" class="button button-select">
+                        <select name="resolutions" class="button trigger" autocomplete='off'>
                             <option value="192">192</option>
                             <option  value="320">320</option>
-                            <option value="480" selected="selected">480</option>
-                            <option value="640">640</option>
-                            <option value="960">960</option>
+                            <option value="480">480</option>
+                            <option value="640" selected="selected">640</option>
+                            <option value="800">800</option>
                         </select>
                     </div>
                 </li>
@@ -39,30 +39,30 @@
                 </li>
                 <li>
                     <div class="ops_options">
-                        <select name="operation" class="button button-select">
+                        <select name="filters" class="button trigger" autocomplete="off">
                             <option value="1" selected="selected">Cartoonize</option>
                             <option  value="2">Sobel&nbspEdge</option>
                             <option value="3">Gaussian&nbspBlur</option>
                         </select>
                     </div>
                 </li>
-                <li><button type="button" class="button" id="toggle">Play</button></li>
+                <li><button type="button" class="button" id="render_toggle">Play</button></li>
             </ul>
         </nav>
 
         <div class="row" id="main_layout">
             <div class="column column-10" id="sidebar">
-                <ul id="info-menu">
-                    <li><label class="button button-outline">FPS&nbsp25</label></li>
-                </ul>
+                <h1>STATS</h1>
+                <label id='fps' class='button'>0 FPS</label>
             </div>
             <div class="column" id="container">
-                <canvas id="viewport" width=640 height=600>
+                <canvas id="viewport" width="800" height="600">
                 </canvas>
             </div>
         </div>
-        <script src="js/lib/jquery.min.js"></script>
-        <script src="js/lib/gpu.min.js"></script>
-        <script src="js/main.js"></script>
+    <script src="js/lib/jquery.min.js"></script>
+    <script src="js/lib/gpu.min.js?nocache"></script>
+    <script src="js/ui.js?nocache"></script>
+    <script src="js/main.js?nocache"></script>
     </body>
 </html>

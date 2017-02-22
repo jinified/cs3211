@@ -1,45 +1,56 @@
-var ctx = document.getElementById('viewport').getContext('2d');
-var imgObj = new Image();
-imgObj.src="img/Lenna.png";
-imgObj.onload = function() {
-    ctx.drawImage(imgObj, 0, 0); 
+var cpu_renderer = createRenderer('cpu');
+var gpu_renderer = createRenderer('gpu');
+var kernel = opts.gpuMode ? gpu_renderer : cpu_renderer;
+var canvas = kernel.getCanvas();
+
+var fps = { startTime : 0, frameNumber : 0,
+           getFPS : function(display) {
+              this.frameNumber++;
+              var d = new Date().getTime(), currentTime = ( d - this.startTime ) / 1000, result = Math.floor( ( (this.frameNumber*10) / currentTime ) );
+              if( currentTime > 1 ) {
+                 this.startTime = new Date().getTime();
+                 this.frameNumber = 0;
+              }
+              display.text(result/10.0 + ' fps');
+           }
 };
 
-// Labels
-const MODE_GPU = "GPU Mode";
-const MODE_CPU = "CPU Mode";
-
-// Color table
-const COLOR_BTN_SUCCESS = "#2ECC40";
-const COLOR_BTN_WARNING = "#FF4136";
-
-// State variables
-
-var playing = false;
-var gpuMode = true;
-
-function toggle(e) {
-    if (playing) {
-        $(e.target).css("background-color", COLOR_BTN_SUCCESS);
-        $(e.target).text("Play");
-        playing = false;
-    } else {
-        $(e.target).css("background-color", COLOR_BTN_WARNING);
-        $(e.target).text("Stop");
-        playing = true;
-    }
+function toImg(width, height) {
+    var gpu = new GPU();
+    return gpu.createKernel(function(A) {
+this.color(A[0][this.thread.y][this.thread.x],A[1][this.thread.y][this.thread.x],A[2][this.thread.y][this.thread.x]);
+}).dimensions([width, height]).graphical(true);
 }
 
-function switch_mode(e) {
-    if (gpuMode) {
-        $(e.target).text(MODE_CPU);
-        gpuMode = false;
-    } else {
-        $(e.target).text(MODE_GPU);
-        gpuMode = true;
-    }
+function createRenderer(mode, width=opts.width) {
+    var height = width / 4 * 3;
+    var gpu = new GPU();
+    var options = {
+        dimensions: [width, height, 4],
+        debug: false,
+        graphical: false,
+        constants: {
+            height: height,
+            width: width,
+        },
+        mode: mode
+    };
+    return gpu.createKernel(function (img) {
+        return img[this.thread.z][this.thread.y][this.thread.x]
+    }, options);
 }
 
-// Callback initialization
-$('#toggle').click(toggle);
-$('#mode').click(switch_mode);
+function render(opts) {
+    fps.getFPS($('#fps'));
+    var kernel = opts.gpuMode ? createRenderer("gpu", opts.width)
+                              : createRenderer("cpu", opts.width);
+    var container = document.getElementById("container");
+    var old_canvas = document.getElementsByTagName("canvas")[0];
+    height = opts.width / 4 * 3;
+    kernel = toImg(opts.width, height);
+    kernel(opts.loadedImage);
+    var new_canvas = kernel.getCanvas();
+    new_canvas.id = old_canvas.id;
+    container.replaceChild(new_canvas, old_canvas);
+}
+
