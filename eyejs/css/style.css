@@ -29,9 +29,9 @@ body {
 #main-menu li .button {
     display: block;
     text-align: center;
-    margin: 1.4rem 1.4rem;
+    margin: 1.2rem 1.2rem;
     color: #FFFFFF;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
 }
 
 #ops_label {
@@ -83,10 +83,4 @@ body {
 
 #container {
     text-align: center;
-}
-
-#viewport canvas {
-    padding: 0;
-    margin: auto;
-    display: block;
 }

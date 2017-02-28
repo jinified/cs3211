@@ -14,8 +14,10 @@ var opts = {
     loadedImage: false,
     playing: false,
     gpuMode: true,
-    width: 480,
+    width: 800,
+    height: 600,
     operation: 1,
+    tick_interval: 1000,
 }
 
 function loadImage() {
@@ -24,9 +26,8 @@ function loadImage() {
     var img = new Image(MAX_WIDTH, MAX_HEIGHT);
     img.src = "img/Lenna.png";
     img.onload = function () {
-        ctx.drawImage(img, 0, 0, img.width, img.height,
-                           0, 0, canvas.width, canvas.height);
-        opts.loadedImage = imgToArray(ctx.getImageData(0, 0, canvas.width, canvas.height), canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        opts.loadedImage = imgToArray(ctx.getImageData(0, 0, img.width, img.height), canvas.width, canvas.height);
     };
 }
 
@@ -39,6 +40,7 @@ function render_toggle(e) {
         $(e.target).css("background-color", COLOR_BTN_WARNING);
         $(e.target).text("Stop");
         opts.playing = true;
+        render();
     }
 }
 
@@ -54,6 +56,7 @@ function switch_mode(e) {
 
 function renderLoop(e) {
     opts.width = $("select[name=resolutions] option:selected").val();
+    opts.height = opts.width / 4 * 3;
     opts.operation = $("select[name=filters] option:selected").val();
     render(opts);
 }
@@ -70,7 +73,7 @@ function addEventListenerByClass(classname, event, func) {
 function imgToArray(imageData, width, height) {
     // Converts imageData array with r,g,b,a values to a 4D array
     var pointer = 0;
-    var img = []
+    var img = [];
 
     for (var channel=0; channel<4; channel++) {
         img.push([]);
@@ -81,6 +84,7 @@ function imgToArray(imageData, width, height) {
 
     for (var y=0; y < height; y++) {
         for (var x=0; x < width; x++) {
+             // Y-position inverted to follow right-hand system
              img[0][height-y-1][x] = imageData.data[pointer++]/256;
              img[1][height-y-1][x] = imageData.data[pointer++]/256;
              img[2][height-y-1][x] = imageData.data[pointer++]/256;
