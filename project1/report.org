@@ -3,26 +3,21 @@
 #+TITLE: CS3211 project 1 - Image processing: implementation and analysis
 
 * TODO Part 1
-
+  
 ** Hardware
-*** Find out hardwares used in lab and Tembusu clusters
-#+BEGIN_SRC shell
-#!/usr/bin/sh
-
-# Create dir to store log
-cd log || mkdir log
-
-# Get CPU information
-lscpu > log/lscpu.log
-cat /proc/cpuinfo > log/cpuinfo.log 
-
-# Get memory information
-cat /proc/meminfo > log/meminfo.log
-#+END_SRC
-
-#+RESULTS:
-
+*** Lab Machine
+**** 8-cores
+**** L1: 64K (instruction and data), L2: 256k, L3: 8192K
+**** 16GB total memory
+**** 1.6 GHz
+*** Tembusu Machine
+**** 24-cores
+**** L1: 64K (instruction and data), L2: 256k, L3: 15360K
+**** 65GB total memory
+**** 2.4 GHz per core
 *** How the hardware contributes to the result
+**** More cores offer better parallelization which is significant if the software is written to take advantage of it
+**** The machine with higher clock-speed will perform better if the task is not parallelized
 ** Speedup
 
 *** Tabulate result from Lab01 Task 3 (lab machine, 8 threads)
