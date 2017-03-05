@@ -26,7 +26,7 @@ def write_csv(path, data, headers):
 
 def plotFixedTimeSpeedup(path, n_threads, size=[128, 256, 384, 512, 768, 1024]):
     data = read_pickle(path)
-    largest_size = size[-2]
+    largest_size = size[-1]
     serial_time = data[largest_size][0]  # Serial time for largest problem size
     speedup = [i / serial_time for i in data[largest_size]]
     fig = plt.figure()
@@ -126,10 +126,10 @@ def lab2_task7(path="lab2_task7/task7_"):
 
 
 if __name__ == '__main__':
-    # lab1_task3()
-    # lab1_task4()
+    lab1_task3()
+    lab1_task4()
     # lab1_task6()
     # lab2_task7()
-    lab2_task12()
+    # lab2_task12()
     # lab2_task3()
     # lab2_task4()
