@@ -21,7 +21,7 @@
             <ul>
                 <li><a class="button" href="https://github.com/jinified/cs3211/tree/master/eyejs">Source</a></li>
                 <li><a class="button" id="mode">GPU Mode</a></li>
-                <li><label class="button" id="size_label">Size:</label>
+                <li><label class="button label">Size:</label>
                 </li>
                 <li>
                     <div class="canvas_options">
@@ -34,23 +34,35 @@
                         </select>
                     </div>
                 </li>
-                <li><label class="button" id="ops_label">Chosen&nbspOperation:</label>
+                <li><label class="button label">Chosen&nbspOperation:</label>
                 </li>
                 <li>
                     <div class="ops_options">
                         <select name="filters" class="button trigger" autocomplete="off">
-                            <option value="1" selected="selected">Cartoonize</option>
-                            <option  value="2">Sobel&nbspEdge</option>
-                            <option value="3">Gaussian&nbspBlur</option>
+                            <option value="0" selected="selected">BoxBlur</option>
+                            <option  value="1">GaussianBlur</option>
+                            <option value="2">Sharpen</option>
+                            <option value="3">LaplacianEdge</option>
                         </select>
                     </div>
                 </li>
-                <li><button type="button" class="button" id="render_toggle">Play</button></li>
+                <li><label class="button label">Kernel Size:</label></li>
+                <li>
+                    <div class="kernel_options">
+                        <select name="kernel" class="button trigger" autocomplete='off'>
+                            <option value="3" selected="selected">3</option>
+                            <option  value="5">5</option>
+                            <option value="9">9</option>
+                        </select>
+                    </div>
+                </li>
             </ul>
         </nav>
 
         <div class="row" id="main_layout">
             <div class="column column-10" id="sidebar">
+                <button type="button" class="button" id="render_toggle">Play</button>
+                <button type="button" class="button" id="antialias_toggle">AntiAlias</button>
                 <h1>STATS</h1>
                 <label id='fps' class='button'>0 FPS</label>
             </div>

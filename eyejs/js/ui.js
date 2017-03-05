@@ -11,13 +11,30 @@ const MAX_HEIGHT = 600;
 // State variables
 
 var opts = {
-    loadedImage: false,
+    imgArr: {},
     playing: false,
+    antialias: false,
     gpuMode: true,
     width: 800,
     height: 600,
     operation: 1,
+    kernel: 3,
     tick_interval: 1000,
+};
+
+function readImage(src, width, height) {
+    // Read image of different sizes
+    var img = new Image();
+    img.src = src;
+    var canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    var ctx = canvas.getContext("2d");
+    img.onload = function() {
+        ctx.drawImage(img, 0, 0);
+        var imgArray = imgToArray(ctx.getImageData(0, 0, width, height), width, height);
+        opts.imgArr[width] = imgArray;
+    };
 }
 
 function loadImage() {
@@ -27,8 +44,20 @@ function loadImage() {
     img.src = "img/Lenna.png";
     img.onload = function () {
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        opts.loadedImage = imgToArray(ctx.getImageData(0, 0, img.width, img.height), canvas.width, canvas.height);
     };
+}
+
+function antialias_toggle(e) {
+    if (opts.antialias) {
+        $(e.target).css("background-color", COLOR_BTN_SUCCESS);
+        $(e.target).text("AntiAlias ON");
+        opts.antialias = false;
+    } else {
+        $(e.target).css("background-color", COLOR_BTN_WARNING);
+        $(e.target).text("AntiAlias OFF");
+        opts.antialias = true;
+    }
+    render(opts);
 }
 
 function render_toggle(e) {
@@ -40,7 +69,7 @@ function render_toggle(e) {
         $(e.target).css("background-color", COLOR_BTN_WARNING);
         $(e.target).text("Stop");
         opts.playing = true;
-        render();
+        render(opts);
     }
 }
 
@@ -52,12 +81,15 @@ function switch_mode(e) {
         $(e.target).text(MODE_GPU);
         opts.gpuMode = true;
     }
+    render(opts);
 }
 
 function renderLoop(e) {
+    console.log("pressed");
     opts.width = $("select[name=resolutions] option:selected").val();
     opts.height = opts.width / 4 * 3;
     opts.operation = $("select[name=filters] option:selected").val();
+    opts.kernel = $("select[name=kernel] option:selected").val();
     render(opts);
 }
 
@@ -99,6 +131,14 @@ window.onload = function() {
     // Does not support IE8 since no attachEvent handled
     addEventListenerByClass('trigger', 'change', renderLoop);
     $('#render_toggle').click(render_toggle);
+    $('#antialias_toggle').click(antialias_toggle);
     $('#mode').click(switch_mode);
+
+    // Load images of different resolutions
+    readImage("img/lenna800.png", 800, 600);
+    readImage("img/lenna640.png", 640, 480);
+    readImage("img/lenna480.png", 480, 360);
+    readImage("img/lenna320.png", 320, 240);
+    readImage("img/lenna192.png", 192, 144);
     loadImage();
 };

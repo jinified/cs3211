@@ -29,25 +29,23 @@ body {
 #main-menu li .button {
     display: block;
     text-align: center;
-    margin: 1.2rem 1.2rem;
+    margin: 1rem 1rem;
     color: #FFFFFF;
     font-size: 1.5rem;
 }
 
-#ops_label {
+.label {
     background: transparent;
     border: none;
     padding-right: 0;
 }
 
-#size_label {
+.label:hover {
     background: transparent;
-    border: none;
-    padding: 0;
 }
 
-.ops_options {
-    overflow: hidden;
+#antialias_toggle {
+    background-color:  #2ECC40;
 }
 
 #render_toggle {
@@ -59,9 +57,8 @@ body {
 }
 
 #main_layout {
-    margin: 2rem;
+    width: 100%;
 }
-
 
 /* Sidebar */
 
@@ -76,7 +73,7 @@ body {
 
 #fps {
     background-color:  #B10DC9;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
 }
 
 /* Main canvas */

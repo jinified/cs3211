@@ -1,20 +1,75 @@
+// Initialize GPU instance and add functions
 var gpu = new GPU();
+gpu.addFunction(isValidIndex);
+
 var animIndex = 0;
-var cpu_renderer = createRenderer('cpu');
-var gpu_renderer = createRenderer('gpu');
-var kernel = opts.gpuMode ? gpu_renderer : cpu_renderer;
-var canvas = kernel.getCanvas();
-var gpuFilter = makeAvgFilter('gpu', opts.width, opts.height);
-var marquee = makeAnimator('gpu', opts.width, opts.height);
-var sobelKernel = [[-1, 0, 1],
-                   [-2, 0, 2],
-                   [-1, 0, 1]];
+var resolutions = [[192, 144], [320, 240], [480, 360], [640, 480], [800, 600]];
 
+// Various kernels
+var gaussianKernel = {
+    '3': [0.109634,    0.111842,    0.109634,
+          0.111842,    0.114094,    0.111842,
+          0.109634,    0.111842,    0.109634,],
 
-var fps = { startTime : 0, frameNumber : 0,
+    '5': [0.036894,    0.039167,    0.039956,    0.039167,    0.036894,
+          0.039167,    0.041581,    0.042418,    0.041581,    0.039167,
+          0.039956,    0.042418,    0.043272,    0.042418,    0.039956,
+          0.039167,    0.041581,    0.042418,    0.041581,    0.039167,
+          0.036894,    0.039167,    0.039956,    0.039167,    0.036894],
+
+    '9': [0.008397,    0.009655,    0.010667,    0.011324,    0.011552,    0.011324,    0.010667,    0.009655,    0.008397,
+          0.009655,    0.0111  ,    0.012264,    0.013019,    0.013282,    0.013019,    0.012264,    0.0111  ,    0.009655,
+          0.010667,    0.012264,    0.013549,    0.014384,    0.014674,    0.014384,    0.013549,    0.012264,    0.010667,
+          0.011324,    0.013019,    0.014384,    0.01527 ,    0.015578,    0.01527 ,    0.014384,    0.013019,    0.011324,
+          0.011552,    0.013282,    0.014674,    0.015578,    0.015891,    0.015578,    0.014674,    0.013282,    0.011552,
+          0.011324,    0.013019,    0.014384,    0.01527 ,    0.015578,    0.01527 ,    0.014384,    0.013019,    0.011324,
+          0.010667,    0.012264,    0.013549,    0.014384,    0.014674,    0.014384,    0.013549,    0.012264,    0.010667,
+          0.009655,    0.0111  ,    0.012264,    0.013019,    0.013282,    0.013019,    0.012264,    0.0111  ,    0.009655,
+          0.008397,    0.009655,    0.010667,    0.011324,    0.011552,    0.011324,    0.010667,    0.009655,    0.008397,]
+};
+
+var laplacianKernel = {
+    '3': genLaplacian(3),
+    '5': genLaplacian(5),
+    '9': genLaplacian(9)
+};
+
+var sobelKernel = {
+    '3': [1.5,  1.5,  0.5,
+          1.5,  0.5, -0.5,
+          0.5, -0.5, -0.5]
+};
+
+var sobelXKernel = {
+    '3': [1, 0, -1,
+          2, 0, -2,
+          1, 0, -1],
+
+    '5': [2, 1, 0, -1, -2,
+          3, 2, 0, -2, -3,
+          4, 3, 0, -3, -4,
+          3, 2, 0, -2, -3,
+          2, 1, 0, -1, -2],
+
+    '9': [4, 3, 2, 1, 0, -1, -2, -3, -4,
+          5, 4, 3, 2, 0, -2, -3, -4, -5,
+          6, 5, 4, 3, 0, -3, -4, -5, -6,
+          7, 6, 5, 4, 0, -4, -5, -6, -7,
+          8, 7, 6, 5, 0, -5, -6, -7, -8,
+          7, 6, 5, 4, 0, -4, -5, -6, -7,
+          6, 5, 4, 3, 0, -3, -4, -5, -6,
+          5, 4, 3, 2, 0, -2, -3, -4, -5,
+          4, 3, 2, 1, 0, -1, -2, -3, -4,]
+};
+
+var fps = {
+    startTime : 0,
+    frameNumber : 0,
     getFPS : function(display) {
         this.frameNumber++;
-        var d = new Date().getTime(), currentTime = ( d - this.startTime ) / 1000, result = Math.floor( ( (this.frameNumber*10) / currentTime ) );
+        var d = new Date().getTime();
+        var currentTime = (d - this.startTime) / 1000;
+        var result = Math.floor(((this.frameNumber*10) / currentTime));
         if( currentTime > 1 ) {
             this.startTime = new Date().getTime();
             this.frameNumber = 0;
@@ -23,13 +78,122 @@ var fps = { startTime : 0, frameNumber : 0,
     }
 };
 
-function toImg(width, height) {
-    return gpu.createKernel(function(A) {
-this.color(A[0][this.thread.y][this.thread.x],A[1][this.thread.y][this.thread.x],A[2][this.thread.y][this.thread.x]);
-}).dimensions([width, height]).graphical(true);
+// GPU kernel functions
+var kernels = [genKernel(makeBoxFilter),
+               genKernel(makeGaussianFilter),
+               genKernel(makeSharpenFilter),
+               genKernel(makeLaplacianFilter),
+               genKernel(toGrayscale),
+               genKernel(createRenderer),
+               genKernel(makeMotion),
+               genKernel(makeBlender)];
+
+// Main render loop
+
+function render(opts) {
+    // User specified canvas resolution
+    var res = opts.width;
+    var kern_size = opts.kernel;
+    var mode = opts.gpuMode ? "gpu" : "cpu";
+    var ops = opts.operation;
+
+    fps.getFPS($('#fps'));
+    var renderer = kernels[5][res][mode];
+    var converter = toImg(opts.width, opts.height);
+
+    // Image processing
+    var container = document.getElementById("container");
+    var old_canvas = document.getElementsByTagName("canvas")[0];
+    var filtered = renderer(opts.imgArr[res]);
+
+    if (opts.antialias) {
+        filtered = antiAlias(mode, filtered, res);
+    }
+
+    var selected_filter = kernels[ops][res][mode][kern_size];
+
+    if (ops === '0') {
+        filtered = selected_filter(filtered);
+    }
+    if (ops === '1') {
+        filtered = selected_filter(filtered, gaussianKernel[kern_size]);
+    }
+    if (ops === '2') {
+        filtered = selected_filter(filtered, laplacianKernel[kern_size]);
+    }
+    if (ops === '3') {
+        filtered = selected_filter(filtered, laplacianKernel[kern_size]);
+        filtered = kernels[4][res][mode](filtered);
+    }
+
+    // Animation
+    if (opts.playing) {
+        filtered = kernels[6][res].gpu(filtered, animIndex);
+    }
+
+    // Writing to canvas
+    converter(filtered);
+    var new_canvas = converter.getCanvas();
+    new_canvas.id = old_canvas.id;
+    container.replaceChild(new_canvas, old_canvas);
+
+    if (opts.playing) {
+        animIndex = (animIndex+10) % opts.width;
+        setTimeout(function() {
+            render(opts);
+        }, opts.interval);
+    }
 }
 
-function createRenderer(mode, width=opts.width, height=opts.height) {
+// Utility 
+
+function genKernel(func) {
+    kernels = {};
+    resolutions.forEach(function(size) {
+        kernels[size[0]] = {};
+        kernels[size[0]].gpu = func('gpu', size[0], size[1]);
+        kernels[size[0]].cpu = func('cpu', size[0], size[1]);
+    });
+    return kernels;
+}
+
+function isValidIndex(height, width, y, x) {
+    if (y < 0 || y > height-1 || x < 0 || x > width-1) {
+        return 0;
+    }
+    return 1;
+}
+
+function makeBlender(mode, width, height) {
+    var opt = {
+        dimensions: [width, height, 4],
+        debug: false,
+        graphical: false,
+        outputToTexture: true,
+        mode: mode
+    };
+
+    var filt = gpu.createKernel(
+        function(A, B, alpha, beta) {
+            return alpha*A[this.thread.z][this.thread.y][this.thread.x] +
+                   beta*B[this.thread.z][this.thread.y][this.thread.x];
+
+        }, opt);
+
+    return filt;
+}
+
+function toImg(width, height) {
+    return gpu.createKernel(
+        function(A) {
+            this.color(A[0][this.thread.y][this.thread.x],
+                       A[1][this.thread.y][this.thread.x],
+                       A[2][this.thread.y][this.thread.x]);
+        }
+    ).dimensions([width, height]).graphical(true);
+}
+
+function createRenderer(mode, width, height) {
     var options = {
         dimensions: [width, height, 4],
         debug: true,
@@ -41,42 +205,115 @@ function createRenderer(mode, width=opts.width, height=opts.height) {
         },
         mode: mode
     };
-    return gpu.createKernel(function (img) {
-        return img[this.thread.z][this.thread.y][this.thread.x];
-    }, options);
+    return gpu.createKernel(
+        function (img) {
+            return img[this.thread.z][this.thread.y][this.thread.x];
+        }, options);
 }
 
-function render() {
-    fps.getFPS($('#fps'));
-    var rgb2gray = toGrayscale('gpu', opts.width, opts.height);
-    var gpuLaplacianFilter = makeLaplacianFilter('gpu', opts.width, opts.height);
-    var gpuSobelFilter = makeSobelYFilter('gpu', opts.width, opts.height);
-    var cpuSobelFilter = makeSobelYFilter('cpu', opts.width, opts.height);
-    var gpuAvgFilter = makeAvgFilter('gpu', opts.width, opts.height);
-    var cpuAvgFilter = makeAvgFilter('cpu', opts.width, opts.height);
-    var kernel = opts.gpuMode ? createRenderer("gpu", opts.width)
-                              : createRenderer("cpu", opts.width);
-    var container = document.getElementById("container");
-    var old_canvas = document.getElementsByTagName("canvas")[0];
-    orig = kernel(opts.loadedImage);
-    // var filtered = marquee(orig, animIndex);
-    // animIndex = (animIndex+10) % opts.width;
-    // var filtered = gpuSobelFilter(orig);
-    var gray = rgb2gray(orig);
-    var filtered = gpuLaplacianFilter(gray);
-    var converter = toImg(opts.width, opts.height);
-    converter(filtered);
-    var new_canvas = converter.getCanvas();
-    new_canvas.id = old_canvas.id;
-    container.replaceChild(new_canvas, old_canvas);
+function gauss(x, y, std) {
+    var divisor = 2*std*std;
+    var distance = (x*x) + (y*y);
+    var exponent = Math.exp(-distance / divisor);
+    return (1 / (Math.sqrt(2*3.1416*std*std))) * exponent;
+}
 
-    if (opts.playing) {
-        setTimeout(render, opts.interval);
+// Kernel formulas
+
+function genGaussian(n, std) {
+    var offset = Math.floor(n/2);
+    var kernel = [];
+    var index = 0;
+    kernel.length = n*n;
+    for (var j=-offset; j < offset + 1; j++) {
+        for (var i=-offset; i < offset + 1; i++) {
+            kernel[index++] = gauss(j, i, std);
+        }
     }
+    return kernel;
+}
+
+function genLaplacian(n) {
+    var kernel = [];
+    kernel.length = n*n;
+    kernel.fill(-1);
+    kernel[Math.ceil(n*n/2)] = n*n - 1;
+    return kernel;
+}
+
+// Filtering
+
+function makeSharpenFilter(mode, width, height) {
+    // Creates sharpen filter with size 3 x 3
+    var opt = {
+        dimensions: [width, height, 4],
+        debug: true,
+        graphical: false,
+        outputToTexture: true,
+        mode: mode
+    };
+
+    var filters = {
+        '3': gpu.createKernel(
+                function(img, arr) {
+                    if (this.thread.z < 3) {
+                        var sum = 0;
+                        var index = 0;
+                        for (var j=-1; j < 2; j++) {
+                            for(var i=-1; i < 2; i++) {
+                                if (isValidIndex(this.dimensions.y, this.dimensions.x, this.thread.y+j, this.thread.x+i) == 1) {
+                                    sum += img[this.thread.z][this.thread.y+j][this.thread.x+i]*arr[index++];
+                                }
+                            }
+                        }
+                        return img[this.thread.z][this.thread.y][this.thread.x] + 0.6 * sum;
+                    } else {
+                        return img[this.thread.z][this.thread.y][this.thread.x];
+                    }
+                }, opt),
+
+        '5': gpu.createKernel(
+                function(img, arr) {
+                    if (this.thread.z < 3) {
+                        var sum = 0;
+                        var index = 0;
+                        for (var j=-2; j < 3; j++) {
+                            for(var i=-2; i < 3; i++) {
+                                if (isValidIndex(this.dimensions.y, this.dimensions.x, this.thread.y+j, this.thread.x+i) == 1) {
+                                    sum += img[this.thread.z][this.thread.y+j][this.thread.x+i]*arr[index++];
+                                }
+                            }
+                        }
+                        return img[this.thread.z][this.thread.y][this.thread.x] + 0.4 * sum;
+                    } else {
+                        return img[this.thread.z][this.thread.y][this.thread.x];
+                    }
+                }, opt),
+
+        '9': gpu.createKernel(
+                function(img, arr) {
+                    if (this.thread.z < 3) {
+                        var sum = 0;
+                        var index = 0;
+                        for (var j=-4; j < 5; j++) {
+                            for(var i=-4; i < 5; i++) {
+                                if (isValidIndex(this.dimensions.y, this.dimensions.x, this.thread.y+j, this.thread.x+i) == 1) {
+                                    sum += img[this.thread.z][this.thread.y+j][this.thread.x+i]*arr[index++];
+                                }
+                            }
+                        }
+                        return img[this.thread.z][this.thread.y][this.thread.x] + 0.3 * sum;
+                    } else {
+                        return img[this.thread.z][this.thread.y][this.thread.x];
+                    }
+                }, opt)
+    };
+
+    return filters;
 }
 
 function makeLaplacianFilter(mode, width, height) {
-    // Creates average filter with size 3 x 3
+    // Creates Laplacian filter with size 3 x 3
     var opt = {
         dimensions: [width, height, 4],
         debug: true,
@@ -84,52 +321,67 @@ function makeLaplacianFilter(mode, width, height) {
         outputToTexture: true,
         mode: mode
     };
-    var filter = gpu.createKernel(function(img) {
-        var tl, t, tr, l, c, r, bl, b, br;
-        if (this.thread.y > 0 && this.thread.y < this.dimensions.y - 2 && this.thread.x > 0 && this.thread.x < this.dimensions.x - 2 && this.thread.z < 3) {
-            t = img[this.thread.z][this.thread.y-1][this.thread.x]*-1;
-            l = img[this.thread.z][this.thread.y][this.thread.x-1]*-1;
-            c = img[this.thread.z][this.thread.y][this.thread.x]*4;
-            r = img[this.thread.z][this.thread.y][this.thread.x+1]*-1;
-            b = img[this.thread.z][this.thread.y+1][this.thread.x]*-1;
-            return t + l + c + r + b;
-        } else {
-            return img[this.thread.z][this.thread.y][this.thread.x];
-        }
-    },opt);
-    return filter;
-}
-function makeSobelXFilter(mode, width, height) {
-    // Creates average filter with size 3 x 3
-    var opt = {
-        dimensions: [width, height, 4],
-        debug: true,
-        graphical: false,
-        outputToTexture: true,
-        mode: mode
+
+    var filters = {
+        '3': gpu.createKernel(
+                function(img, arr) {
+                    if (this.thread.z < 3) {
+                        var sum = 0;
+                        var index = 0;
+                        for (var j=-1; j < 2; j++) {
+                            for(var i=-1; i < 2; i++) {
+                                if (isValidIndex(this.dimensions.y, this.dimensions.x, this.thread.y+j, this.thread.x+i) == 1) {
+                                    sum += img[this.thread.z][this.thread.y+j][this.thread.x+i]*arr[index++];
+                                }
+                            }
+                        }
+                        return sum;
+                    } else {
+                        return img[this.thread.z][this.thread.y][this.thread.x];
+                    }
+                }, opt),
+
+        '5': gpu.createKernel(
+                function(img, arr) {
+                    if (this.thread.z < 3) {
+                        var sum = 0;
+                        var index = 0;
+                        for (var j=-2; j < 3; j++) {
+                            for(var i=-2; i < 3; i++) {
+                                if (isValidIndex(this.dimensions.y, this.dimensions.x, this.thread.y+j, this.thread.x+i) == 1) {
+                                    sum += img[this.thread.z][this.thread.y+j][this.thread.x+i]*arr[index++];
+                                }
+                            }
+                        }
+                        return sum;
+                    } else {
+                        return img[this.thread.z][this.thread.y][this.thread.x];
+                    }
+                }, opt),
+
+        '9': gpu.createKernel(
+                function(img, arr) {
+                    if (this.thread.z < 3) {
+                        var sum = 0;
+                        var index = 0;
+                        for (var j=-4; j < 5; j++) {
+                            for(var i=-4; i < 5; i++) {
+                                if (isValidIndex(this.dimensions.y, this.dimensions.x, this.thread.y+j, this.thread.x+i) == 1) {
+                                    sum += img[this.thread.z][this.thread.y+j][this.thread.x+i]*arr[index++];
+                                }
+                            }
+                        }
+                        return sum;
+                    } else {
+                        return img[this.thread.z][this.thread.y][this.thread.x];
+                    }
+                }, opt)
     };
-    var filter = gpu.createKernel(function(img) {
-        var tl, t, tr, l, c, r, bl, b, br;
-        if (this.thread.y > 0 && this.thread.y < this.dimensions.y - 2 && this.thread.x > 0 && this.thread.x < this.dimensions.x - 2 && this.thread.z < 3) {
-            tl = img[this.thread.z][this.thread.y-1][this.thread.x-1]*-1;
-            // t = img[this.thread.z][this.thread.y-1][this.thread.x];
-            tr = img[this.thread.z][this.thread.y-1][this.thread.x+1];
-            l = img[this.thread.z][this.thread.y][this.thread.x-1]*-2;
-            // c = img[this.thread.z][this.thread.y][this.thread.x];
-            r = img[this.thread.z][this.thread.y][this.thread.x+1]*2;
-            bl = img[this.thread.z][this.thread.y+1][this.thread.x-1]*-1;
-            // b = img[this.thread.z][this.thread.y+1][this.thread.x];
-            br = img[this.thread.z][this.thread.y+1][this.thread.x+1];
-            return tl + tr + l + r + bl + br;
-        } else {
-            return img[this.thread.z][this.thread.y][this.thread.x];
-        }
-    },opt);
-    return filter;
+
+    return filters;
 }
 
-
-function makeSobelYFilter(mode, width, height) {
+function makeBoxFilter(mode, width, height) {
     // Creates average filter with size 3 x 3
     var opt = {
         dimensions: [width, height, 4],
@@ -138,24 +390,63 @@ function makeSobelYFilter(mode, width, height) {
         outputToTexture: true,
         mode: mode
     };
-    var filter = gpu.createKernel(function(img) {
-        var tl, t, tr, l, c, r, bl, b, br;
-        if (this.thread.y > 0 && this.thread.y < this.dimensions.y - 2 && this.thread.x > 0 && this.thread.x < this.dimensions.x - 2 && this.thread.z < 3) {
-            tl = img[this.thread.z][this.thread.y-1][this.thread.x-1];
-            t = img[this.thread.z][this.thread.y-1][this.thread.x]*2;
-            tr = img[this.thread.z][this.thread.y-1][this.thread.x+1];
-            bl = img[this.thread.z][this.thread.y+1][this.thread.x-1]*-1;
-            b = img[this.thread.z][this.thread.y+1][this.thread.x]*-2;
-            br = img[this.thread.z][this.thread.y+1][this.thread.x+1]*-1;
-            return tl + t + tr + bl + b + br;
-        } else {
-            return img[this.thread.z][this.thread.y][this.thread.x];
-        }
-    },opt);
-    return filter;
+
+    var filters = {
+        '3': gpu.createKernel(
+                function(img) {
+                    if (this.thread.z < 3) {
+                        var sum = 0;
+                        for (var j=-1; j < 2; j++) {
+                            for(var i=-1; i < 2; i++) {
+                                if (isValidIndex(this.dimensions.y, this.dimensions.x, this.thread.y+j, this.thread.x+i) == 1) {
+                                    sum += img[this.thread.z][this.thread.y+j][this.thread.x+i];
+                                }
+                            }
+                        }
+                        return sum / 9;
+                    } else {
+                        return img[this.thread.z][this.thread.y][this.thread.x];
+                    }
+                }, opt),
+
+        '5': gpu.createKernel(
+                function(img) {
+                    if (this.thread.z < 3) {
+                        var sum = 0;
+                        for (var j=-2; j < 3; j++) {
+                            for(var i=-2; i < 3; i++) {
+                                if (isValidIndex(this.dimensions.y, this.dimensions.x, this.thread.y+j, this.thread.x+i) == 1) {
+                                    sum += img[this.thread.z][this.thread.y+j][this.thread.x+i];
+                                }
+                            }
+                        }
+                        return sum / 25;
+                    } else {
+                        return img[this.thread.z][this.thread.y][this.thread.x];
+                    }
+                }, opt),
+
+        '9': gpu.createKernel(
+                function(img) {
+                    if (this.thread.z < 3) {
+                        var sum = 0;
+                        for (var j=-4; j < 5; j++) {
+                            for(var i=-4; i < 5; i++) {
+                                if (isValidIndex(this.dimensions.y, this.dimensions.x, this.thread.y+j, this.thread.x+i) == 1) {
+                                    sum += img[this.thread.z][this.thread.y+j][this.thread.x+i];
+                                }
+                            }
+                        }
+                        return sum / 81;
+                    } else {
+                        return img[this.thread.z][this.thread.y][this.thread.x];
+                    }
+                }, opt)
+    };
+    return filters;
 }
 
-function makeAvgFilter(mode, width, height) {
+function makeGaussianFilter(mode, width, height) {
     // Creates average filter with size 3 x 3
     var opt = {
         dimensions: [width, height, 4],
@@ -164,25 +455,75 @@ function makeAvgFilter(mode, width, height) {
         outputToTexture: true,
         mode: mode
     };
-    var filter = gpu.createKernel(function(img) {
-        var tl, t, tr, l, c, r, bl, b, br;
-        if (this.thread.y > 0 && this.thread.y < this.dimensions.y - 2 && this.thread.x > 0 && this.thread.x < this.dimensions.x - 2 && this.thread.z < 3) {
-            tl = img[this.thread.z][this.thread.y-1][this.thread.x-1];
-            t = img[this.thread.z][this.thread.y-1][this.thread.x];
-            tr = img[this.thread.z][this.thread.y-1][this.thread.x+1];
-            l = img[this.thread.z][this.thread.y][this.thread.x-1];
-            c = img[this.thread.z][this.thread.y][this.thread.x];
-            r = img[this.thread.z][this.thread.y][this.thread.x+1];
-            bl = img[this.thread.z][this.thread.y+1][this.thread.x-1];
-            b = img[this.thread.z][this.thread.y+1][this.thread.x];
-            br = img[this.thread.z][this.thread.y+1][this.thread.x+1];
-            return (tl + t + tr + l + c + r + bl + b + br) / 9.0;
-        } else {
-            return img[this.thread.z][this.thread.y][this.thread.x];
-        }
-    },opt);
-    return filter;
+
+    var filters = {
+        '3': gpu.createKernel(
+                function(img, arr) {
+                    if (this.thread.z < 3) {
+                        var sum = 0;
+                        var index = 0;
+                        for (var j=-1; j < 2; j++) {
+                            for(var i=-1; i < 2; i++) {
+                                if (isValidIndex(this.dimensions.y, this.dimensions.x, this.thread.y+j, this.thread.x+i) == 1) {
+                                    sum += img[this.thread.z][this.thread.y+j][this.thread.x+i]*arr[index++];
+                                }
+                            }
+                        }
+                        return sum;
+                    } else {
+                        return img[this.thread.z][this.thread.y][this.thread.x];
+                    }
+                }, opt),
+
+        '5': gpu.createKernel(
+                function(img, arr) {
+                    if (this.thread.z < 3) {
+                        var sum = 0;
+                        var index = 0;
+                        for (var j=-2; j < 3; j++) {
+                            for(var i=-2; i < 3; i++) {
+                                if (isValidIndex(this.dimensions.y, this.dimensions.x, this.thread.y+j, this.thread.x+i) == 1) {
+                                    sum += img[this.thread.z][this.thread.y+j][this.thread.x+i]*arr[index++];
+                                }
+                            }
+                        }
+                        return sum;
+                    } else {
+                        return img[this.thread.z][this.thread.y][this.thread.x];
+                    }
+                }, opt),
+
+        '9': gpu.createKernel(
+                function(img, arr) {
+                    if (this.thread.z < 3) {
+                        var sum = 0;
+                        var index = 0;
+                        for (var j=-4; j < 5; j++) {
+                            for(var i=-4; i < 5; i++) {
+                                if (isValidIndex(this.dimensions.y, this.dimensions.x, this.thread.y+j, this.thread.x+i) == 1) {
+                                    sum += img[this.thread.z][this.thread.y+j][this.thread.x+i]*arr[index++];
+                                }
+                            }
+                        }
+                        return sum;
+                    } else {
+                        return img[this.thread.z][this.thread.y][this.thread.x];
+                    }
+                }, opt)
+    };
+    return filters;
 }
+
+function antiAlias(mode, img, res) {
+    // Smooth out edges to approximate anti-aliasing. Inspired by FXAA (Fast Approximate Anti-Aliasing)
+    // Perform Gaussian Blur after applying Laplacian filtered image.
+    var filtered = kernels[3][res][mode]["3"](img, laplacianKernel["3"]);
+    filtered = kernels[1][res][mode]["3"](filtered, gaussianKernel["3"]);
+    filtered = kernels[7][res][mode](img, filtered, 0.9, 0.1);
+    return filtered;
+}
+
+// Color processing 
 
 function toGrayscale(mode, width, height) {
     // Creates average filter with size 3 x 3
@@ -193,32 +534,36 @@ function toGrayscale(mode, width, height) {
         outputToTexture: true,
         mode: mode
     };
-    var filter = gpu.createKernel(function(img) {
-        if (this.thread.z < 3) {
-            var r = img[0][this.thread.y][this.thread.x];
-            var g = img[1][this.thread.y][this.thread.x];
-            var b = img[2][this.thread.y][this.thread.x];
-            return (r+g+b) / 3.0;
-        } else {
-            return img[this.thread.z][this.thread.y][this.thread.x];
-        }
-    },opt);
+    var filter = gpu.createKernel(
+        function(img) {
+            if (this.thread.z < 3) {
+                var r = img[0][this.thread.y][this.thread.x];
+                var g = img[1][this.thread.y][this.thread.x];
+                var b = img[2][this.thread.y][this.thread.x];
+                return (r+g+b) / 3.0;
+            } else {
+                return img[this.thread.z][this.thread.y][this.thread.x];
+            }
+        }, opt);
+
     return filter;
 }
 
-function makeAnimator(mode, width, height) {
+// Animation 
+
+function makeMotion(mode, width, height) {
     var opt = {
-	dimensions: [width, height, 4],
-	debug: false,
-	graphical: false,
-	outputToTexture: true,
-	mode: mode
+    dimensions: [width, height, 4],
+    debug: false,
+    graphical: false,
+    outputToTexture: true,
+    mode: mode
     };
 
-    var filt = gpu.createKernel(function(A,x) {
-        // console.log(this.dimensions.z, this.dimensions.y, this.dimensions.x);
-	    return A[this.thread.z][this.thread.y][(this.thread.x + x)];
-	},opt);
+    var filt = gpu.createKernel(
+        function(A,x) {
+            return A[this.thread.z][this.thread.y][(this.thread.x + x)];
+        }, opt);
 
     return filt;
 }
